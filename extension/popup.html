@@ -5,16 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatterPing</title>
     <link rel="stylesheet" href="popup.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="app">
-        <h1>ChatterPing</h1>
-        <div class="status-bar">
-            <span>New mentions: </span>
-            <span id="badge" class="badge">0</span>
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">📡</div>
+                <h1>ChatterPing</h1>
+            </div>
+            <div class="sync-indicator">
+                <div class="sync-dot"></div>
+                <span>Live</span>
+            </div>
         </div>
-        <div id="summary">
-            <p>Loading summary...</p>
+
+        <!-- Stats Card -->
+        <div class="stats-card">
+            <div class="stat-item">
+                <div class="stat-number" id="badge">0</div>
+                <div class="stat-label">New Mentions</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <div class="stat-number">25</div>
+                <div class="stat-label">Today</div>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="summary-card">
+            <div class="summary-header">
+                <h3>AI Summary</h3>
+                <div class="summary-badge">CentralDispatch</div>
+            </div>
+            <div class="summary-content" id="summary">
+                <div class="loading-spinner"></div>
+                <p>Loading summary...</p>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="actions">
+            <button class="btn btn-primary">View Details</button>
+            <button class="btn btn-secondary">Settings</button>
         </div>
     </div>
     <script src="popup.js"></script>
