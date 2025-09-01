@@ -1,0 +1,29 @@
+{
+  "name": "ChatterPing",
+  "version": "0.1.0",
+  "description": "AI-powered browser extension that monitors online chatter for a keyword, summarizes the latest opinions, and notifies the user.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/src/index.js",
+    "dev": "nodemon server/src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "cors": "^2.8.5",
+    "prisma": "^2.30.0",
+    "sqlite3": "^5.0.2",
+    "axios": "^0.21.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  },
+  "keywords": [
+    "chrome",
+    "extension",
+    "AI",
+    "summarization",
+    "Reddit"
+  ],
+  "author": "Warren Edward Jones",
+  "license": "MIT"
+}

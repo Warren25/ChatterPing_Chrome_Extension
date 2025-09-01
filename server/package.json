@@ -1,0 +1,24 @@
+{
+  "name": "chatterping-server",
+  "version": "0.1.0",
+  "description": "Backend server for ChatterPing, a Chrome extension that monitors online chatter.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "prisma": "^2.30.0",
+    "sqlite3": "^5.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

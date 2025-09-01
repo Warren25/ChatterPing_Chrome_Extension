@@ -1,0 +1,7 @@
+model Mention {
+  id        Int      @id @default(autoincrement())
+  title     String
+  url       String
+  excerpt   String
+  createdAt DateTime @default(now())
+}
