@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
+
 const { fetchMentions } = require('./reddit');
 const { generateSummary } = require('./utils/openai');
 

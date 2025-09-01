@@ -4,6 +4,12 @@ const openaiApiKey = process.env.OPENAI_API_KEY;
 const openaiUrl = 'https://api.openai.com/v1/chat/completions';
 
 async function generateSummary(posts) {
+    // For testing: return mock data if no API key is set
+    if (!openaiApiKey || openaiApiKey === 'your_openai_api_key_here') {
+        console.log('OpenAI API key not configured, returning mock summary');
+        return `Mock AI Summary: Found ${posts.length} mentions of your keyword. The overall sentiment appears positive with users discussing logistics and dispatch services. Most recent mentions focus on service quality and new features.`;
+    }
+
     const messages = posts.map(post => ({
         role: 'user',
         content: post.excerpt
