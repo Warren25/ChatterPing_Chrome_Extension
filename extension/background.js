@@ -26,6 +26,9 @@ chrome.runtime.onInstalled.addListener(() => {
         checkInterval: 30, // minutes
         lastCheck: Date.now()
     });
+    
+    // Do initial check for mentions
+    checkForMentions();
 });
 
 // Periodic check for new mentions (example)
@@ -35,6 +38,7 @@ function checkForMentions() {
         .then(data => {
             if (data.mentionCount) {
                 updateBadgeCount(data.mentionCount);
+                console.log(`Updated badge count to: ${data.mentionCount}`);
             }
         })
         .catch(error => {
@@ -50,3 +54,6 @@ chrome.alarms.onAlarm.addListener((alarm) => {
         checkForMentions();
     }
 });
+
+// Do initial check when background script loads
+checkForMentions();

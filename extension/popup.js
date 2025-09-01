@@ -10,10 +10,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const data = await response.json();
         summaryElement.textContent = data.summary;
+        
+        // Update badge count with real data from server
+        badgeElement.textContent = data.mentionCount || '0';
     } catch (error) {
         summaryElement.textContent = 'Error fetching summary: ' + error.message;
+        badgeElement.textContent = '?';
     }
-
-    // Update badge count (dummy value for now)
-    badgeElement.textContent = '5'; // Replace with actual unread count logic
 });

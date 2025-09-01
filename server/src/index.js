@@ -31,6 +31,35 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Debug endpoint to see raw Reddit data
+app.get('/debug/reddit', async (req, res) => {
+  try {
+    const keyword = req.query.keyword || 'CentralDispatch';
+    const mentions = await fetchMentions(keyword);
+    
+    res.json({
+      keyword: keyword,
+      count: mentions.length,
+      posts: mentions.map(post => ({
+        id: post.id,
+        title: post.title,
+        subreddit: post.subreddit,
+        author: post.author,
+        score: post.score,
+        numComments: post.numComments,
+        url: post.url,
+        excerpt: post.excerpt.substring(0, 100) + '...',
+        createdAt: post.createdAt
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      error: 'Failed to fetch Reddit data',
+      message: error.message 
+    });
+  }
+});
+
 // Updated /summarize endpoint
 app.get('/summarize', async (req, res) => {
   try {
@@ -53,7 +82,13 @@ app.get('/summarize', async (req, res) => {
       summary: summary,
       mentionCount: mentions.length,
       keyword: keyword,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
+      samplePosts: mentions.slice(0, 3).map(post => ({
+        title: post.title,
+        subreddit: post.subreddit,
+        score: post.score,
+        url: post.url
+      }))
     });
     
   } catch (error) {
