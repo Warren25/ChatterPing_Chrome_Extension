@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const summaryElement = document.getElementById('summary');
     const badgeElement = document.getElementById('badge');
+    const todayCountElement = document.getElementById('today-count');
 
     // Fetch summary from the server
     try {
@@ -11,11 +12,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const data = await response.json();
         summaryElement.textContent = data.summary;
         
-        // Update badge count with real data from server
-        badgeElement.textContent = data.mentionCount || '0';
+        // Update both badge counts with real data from server
+        const mentionCount = data.mentionCount || 0;
+        badgeElement.textContent = mentionCount;
+        todayCountElement.textContent = mentionCount; // For now, use same count for both
     } catch (error) {
         summaryElement.textContent = 'Error fetching summary: ' + error.message;
         badgeElement.textContent = '?';
+        todayCountElement.textContent = '?';
     }
 
     // Add button functionality
