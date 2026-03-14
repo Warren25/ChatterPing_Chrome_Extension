@@ -17,9 +17,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         badgeElement.textContent = mentionCount;
         todayCountElement.textContent = mentionCount; // For now, use same count for both
     } catch (error) {
-        summaryElement.textContent = 'Error fetching summary: ' + error.message;
-        badgeElement.textContent = '?';
-        todayCountElement.textContent = '?';
+        // User-friendly error messages
+        document.querySelector('.sync-indicator').style.display = 'none';
+        if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
+            summaryElement.innerHTML = `
+                <strong>Unable to connect</strong><br><br>
+                Please check your internet connection and try again.
+            `;
+        } else {
+            summaryElement.textContent = 'Something went wrong. Please try again later.';
+        }
+        badgeElement.textContent = '—';
+        todayCountElement.textContent = '—';
     }
 
     // Add button functionality
@@ -45,7 +54,7 @@ function setupButtonHandlers() {
                 chrome.storage.local.set({ mentionsData: data });
             } catch (error) {
                 console.error('Error fetching details:', error);
-                alert('Unable to load detailed view');
+                alert('Unable to load details. Please check your connection and try again.');
             }
         });
     }
