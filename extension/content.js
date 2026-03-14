@@ -11,10 +11,12 @@ console.log('ChatterPing content script loaded');
 
 // Example: Listen for keyword mentions on the page
 function detectKeywords() {
-    const keywords = ['CentralDispatch']; // This would come from storage later
-    const pageText = document.body.innerText.toLowerCase();
-    
-    keywords.forEach(keyword => {
+    // Load keywords from storage
+    chrome.storage.sync.get(['keyword'], (result) => {
+        const keyword = result.keyword;
+        if (!keyword) return; // No keyword configured
+        
+        const pageText = document.body.innerText.toLowerCase();
         if (pageText.includes(keyword.toLowerCase())) {
             console.log(`ChatterPing: Found "${keyword}" on this page`);
             // Could send message to background script here

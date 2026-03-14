@@ -20,9 +20,9 @@ function updateBadgeCount(count) {
 chrome.runtime.onInstalled.addListener(() => {
     console.log('ChatterPing extension installed');
     
-    // Set default storage values
+    // Set default storage values (keyword left empty - user must configure)
     chrome.storage.sync.set({
-        keyword: 'CentralDispatch',
+        keyword: '',
         checkInterval: 30, // minutes
         lastCheck: Date.now()
     });

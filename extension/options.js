@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadSettings() {
     try {
         const result = await chrome.storage.sync.get({
-            keyword: 'CentralDispatch',
+            keyword: '',
             checkInterval: 30,
             notifications: true,
             autoSummary: true
@@ -63,7 +63,7 @@ async function handleSave(event) {
 async function handleReset() {
     try {
         const defaults = {
-            keyword: 'CentralDispatch',
+            keyword: '',
             checkInterval: 30,
             notifications: true,
             autoSummary: true

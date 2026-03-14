@@ -34,7 +34,10 @@ app.get('/health', (req, res) => {
 // Debug endpoint to see raw Reddit data
 app.get('/debug/reddit', async (req, res) => {
   try {
-    const keyword = req.query.keyword || 'CentralDispatch';
+    const keyword = req.query.keyword;
+    if (!keyword) {
+      return res.status(400).json({ error: 'Keyword parameter is required' });
+    }
     const mentions = await fetchMentions(keyword);
     
     res.json({
@@ -63,13 +66,16 @@ app.get('/debug/reddit', async (req, res) => {
 // Updated /summarize endpoint
 app.get('/summarize', async (req, res) => {
   try {
-    // Fetch mentions for hardcoded keyword
-    const keyword = 'CentralDispatch';
+    // Fetch mentions for user's keyword
+    const keyword = req.query.keyword;
+    if (!keyword) {
+      return res.status(400).json({ error: 'Keyword parameter is required' });
+    }
     const mentions = await fetchMentions(keyword);
     
     if (mentions.length === 0) {
       return res.json({ 
-        summary: 'No recent mentions found for CentralDispatch.',
+        summary: `No recent mentions found for ${keyword}.`,
         mentionCount: 0,
         keyword: keyword
       });
