@@ -76,7 +76,7 @@ app.get('/summarize', async (req, res) => {
     }
 
     // Generate AI summary
-    const summary = await generateSummary(mentions);
+    const summary = await generateSummary(mentions, keyword);
     
     res.json({
       summary: summary,
