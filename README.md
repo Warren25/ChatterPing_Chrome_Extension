@@ -14,7 +14,7 @@ ChatterPing is an AI-powered Chrome extension designed to monitor online chatter
 ### Prerequisites
 
 - Node.js and npm installed on your machine.
-- A valid OpenAI API key (to be configured in the `.env` file).
+- A valid OpenAI API key (see setup below).
 
 ### Installation
 
@@ -30,7 +30,18 @@ ChatterPing is an AI-powered Chrome extension designed to monitor online chatter
    ```
 
 3. Set up environment variables:
-   - Copy `.env.example` to `.env` and fill in the required values.
+   - Copy `.env.example` to `.env`:
+     ```
+     cp server/.env.example server/.env
+     ```
+   - Get your OpenAI API key from: https://platform.openai.com/api-keys
+   - Add credits to your OpenAI account ($5 minimum): https://platform.openai.com/settings/organization/billing/overview
+   - Add your key to `server/.env`:
+     ```
+     OPENAI_API_KEY=sk-your-key-here
+     ```
+
+> **Note:** OpenAI charges ~$0.002 per summary (GPT-3.5-turbo). $5 = ~2,500 summaries.
 
 ### Running the Project
 
