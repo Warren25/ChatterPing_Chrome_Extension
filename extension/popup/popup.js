@@ -60,8 +60,8 @@ async function loadSummary() {
     
     if (!keyword) {
         summaryElement.innerHTML = `
-            <strong>No keyword configured</strong><br><br>
-            Click <strong>Settings</strong> tab to add a keyword to monitor.
+            <p><strong>No keyword configured</strong></p>
+            <p style="margin-top: 8px;">Go to the <strong>Settings</strong> tab to add a keyword to monitor.</p>
         `;
         badgeElement.textContent = '—';
         todayCountElement.textContent = '—';
