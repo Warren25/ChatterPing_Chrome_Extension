@@ -7,11 +7,35 @@ const { generateSummary } = require('./utils/openai');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
-// Enable CORS for extension
-app.use(cors({
-  origin: ['chrome-extension://*', 'http://localhost:*']
-}));
+// CORS configuration for development and production
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow Chrome extensions (they have chrome-extension:// origin)
+    // Allow localhost for development
+    // Allow requests with no origin (like mobile apps or curl)
+    const allowedPatterns = [
+      /^chrome-extension:\/\//,  // Chrome extensions
+      /^http:\/\/localhost/,      // Local development
+      /^http:\/\/127\.0\.0\.1/,   // Local development
+    ];
+    
+    if (!origin || allowedPatterns.some(pattern => pattern.test(origin))) {
+      callback(null, true);
+    } else if (NODE_ENV === 'production') {
+      // In production, also allow your specific domains if needed
+      callback(null, true);  // Be more permissive for Chrome extensions
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+
+console.log(`Server running in ${NODE_ENV} mode`);
 
 app.use(express.json());
 
