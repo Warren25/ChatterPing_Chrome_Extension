@@ -117,6 +117,12 @@ Chrome Web Store listing copy helper:
 
 - [CWS_LISTING_COPY.md](CWS_LISTING_COPY.md)
 
+Pre-submission checklist and packaging instructions:
+
+- [CWS_SUBMISSION_CHECKLIST.md](CWS_SUBMISSION_CHECKLIST.md)
+
+To build the release zip: `bash scripts/build-extension.sh` → outputs `dist/chatterping-v<VERSION>.zip`
+
 ## Contributing
 
 Contributions are welcome! Please follow these steps:
