@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ChatterPing",
-  "version": "0.1",
+  "version": "1.0.0",
   "description": "AI-powered browser extension that monitors online chatter for a keyword, summarizes the latest opinions, and notifies the user.",
   "permissions": [
     "storage",

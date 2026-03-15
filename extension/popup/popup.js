@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    setVersionLabel();
+
     // Initialize tabs
     setupTabs();
     
@@ -14,6 +16,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Setup retry button
     setupRetryButton();
 });
+
+function setVersionLabel() {
+    const versionLabel = document.getElementById('app-version');
+    if (!versionLabel) return;
+
+    const manifest = chrome.runtime.getManifest();
+    versionLabel.textContent = `Version ${manifest.version}`;
+}
 
 // ============== TAB NAVIGATION ==============
 
