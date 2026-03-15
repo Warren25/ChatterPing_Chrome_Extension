@@ -1,6 +1,9 @@
 // Background script for ChatterPing extension
 // This runs in the background and handles extension lifecycle events
 
+// Import config
+importScripts('../config/config.js');
+
 console.log('ChatterPing background script loaded');
 
 // Set up extension icon badge
@@ -33,7 +36,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
 // Periodic check for new mentions (example)
 function checkForMentions() {
-    fetch('http://localhost:3001/summarize')
+    fetch(`${API_URL}/summarize`)
         .then(response => response.json())
         .then(data => {
             if (data.mentionCount) {

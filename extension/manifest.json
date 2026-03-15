@@ -12,7 +12,7 @@
   ],
   "host_permissions": [
     "http://localhost:3001/*",
-    "https://your-api-domain.com/*"
+    "https://chatterping-api.onrender.com/*"
   ],
   "background": {
     "service_worker": "scripts/background.js"

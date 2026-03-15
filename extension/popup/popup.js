@@ -76,7 +76,7 @@ async function loadSummary() {
 
     // Fetch summary from the server
     try {
-        const response = await fetch(`http://localhost:3001/summarize?keyword=${encodeURIComponent(keyword)}`);
+        const response = await fetch(`${API_URL}/summarize?keyword=${encodeURIComponent(keyword)}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -136,7 +136,7 @@ async function loadDetails() {
             return;
         }
         
-        const response = await fetch(`http://localhost:3001/debug/reddit?keyword=${encodeURIComponent(keyword)}`);
+        const response = await fetch(`${API_URL}/debug/reddit?keyword=${encodeURIComponent(keyword)}`);
         if (!response.ok) throw new Error('Failed to fetch');
         
         const data = await response.json();
