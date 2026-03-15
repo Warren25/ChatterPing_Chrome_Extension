@@ -59,6 +59,46 @@ ChatterPing is an AI-powered Chrome extension designed to monitor online chatter
    - Go to the **Settings** tab
    - Enter your target keyword and save
 
+## Testing
+
+The server uses Jest + Supertest for API tests.
+
+### Run tests
+
+1. Install dependencies (if you have not already):
+   ```bash
+   cd server
+   npm install
+   ```
+
+2. Run the full server test suite:
+   ```bash
+   cd server
+   npm test
+   ```
+
+3. Run tests in watch mode while developing:
+   ```bash
+   cd server
+   npm run test:watch
+   ```
+
+### Current test coverage
+
+- `GET /health` returns status and timestamp.
+- `GET /summarize` covers validation, success, zero-mention behavior, and upstream failure handling.
+- `GET /` returns API metadata and endpoint list.
+- `GET /debug/reddit` covers validation, success payload mapping, and failure handling.
+- CORS behavior tests verify:
+  - Allowed localhost origins.
+  - Allowed Chrome extension origins.
+  - Rejected non-allowed origins in non-production mode.
+
+### Notes
+
+- Tests mock external dependencies (Reddit fetch + OpenAI summary) so they run offline and deterministically.
+- The Express app is exported without auto-starting a listener during tests; normal runtime startup is unchanged.
+
 ## Contributing
 
 Contributions are welcome! Please follow these steps:

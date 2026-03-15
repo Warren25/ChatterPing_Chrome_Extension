@@ -5,9 +5,10 @@ require('dotenv').config();
 const { fetchMentions } = require('./reddit');
 const { generateSummary } = require('./utils/openai');
 
-const app = express();
 const PORT = process.env.PORT || 3001;
 const NODE_ENV = process.env.NODE_ENV || 'development';
+
+const app = express();
 
 // CORS configuration for development and production
 const corsOptions = {
@@ -130,6 +131,10 @@ app.get('/summarize', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`ChatterPing server running on http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`ChatterPing server running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
