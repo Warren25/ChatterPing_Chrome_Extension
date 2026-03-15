@@ -99,6 +99,16 @@ The server uses Jest + Supertest for API tests.
 - Tests mock external dependencies (Reddit fetch + OpenAI summary) so they run offline and deterministically.
 - The Express app is exported without auto-starting a listener during tests; normal runtime startup is unchanged.
 
+## Privacy Policy
+
+Chrome Web Store privacy policy URL:
+
+- https://github.com/Warren25/ChatterPing_Chrome_Extension/blob/main/PRIVACY_POLICY.md
+
+The policy source file in this repository is:
+
+- [PRIVACY_POLICY.md](PRIVACY_POLICY.md)
+
 ## Contributing
 
 Contributions are welcome! Please follow these steps:
