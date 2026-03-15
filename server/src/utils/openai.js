@@ -7,7 +7,7 @@ async function generateSummary(posts, keyword) {
     // Fallback if no API key
     if (!openaiApiKey || openaiApiKey === 'your_openai_api_key_here') {
         console.log('OpenAI API key not configured, using fallback summary');
-        return `Found ${posts.length} mentions of your keyword. The overall sentiment appears positive with users discussing logistics and dispatch services. Most recent mentions focus on service quality and new features.`;
+        return `Found ${posts.length} mentions of "${keyword}". The overall sentiment appears mixed with users sharing various opinions and experiences. Most recent discussions involve community feedback and general topics related to ${keyword}.`;
     }
 
     // Build context from posts
