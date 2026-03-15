@@ -4,10 +4,10 @@ ChatterPing is an AI-powered Chrome extension designed to monitor online chatter
 
 ## Features
 
-- **Keyword Tracking**: Monitors mentions of a hardcoded keyword ("CentralDispatch") on Reddit.
-- **Summarization**: Utilizes OpenAI's API to summarize the latest mentions.
-- **User Notifications**: Displays a red badge with the count of unread mentions and a popup panel with recent mentions and summaries.
-- **Local Storage**: Stores mentions locally using SQLite for development.
+- **Configurable Keyword Tracking**: Monitor mentions of any keyword/brand on Reddit via the Settings tab.
+- **AI Summarization**: Uses OpenAI GPT-3.5-turbo to generate sentiment analysis and actionable summaries.
+- **Tabbed Interface**: Summary, Details, and Settings tabs all within the extension popup.
+- **Real-time Updates**: Badge shows mention count with live sync indicator.
 
 ## Getting Started
 
@@ -19,45 +19,45 @@ ChatterPing is an AI-powered Chrome extension designed to monitor online chatter
 ### Installation
 
 1. Clone the repository:
-   ```
-   git clone <repository-url>
+   ```bash
+   git clone https://github.com/Warren25/ChatterPing_Chrome_Extension.git
    cd ChatterPing
    ```
 
-2. Install dependencies for both the extension and server:
-   ```
+2. Install server dependencies:
+   ```bash
+   cd server
    npm install
    ```
 
 3. Set up environment variables:
-   - Copy `.env.example` to `.env`:
-     ```
-     cp server/.env.example server/.env
-     ```
-   - Get your OpenAI API key from: https://platform.openai.com/api-keys
-   - Add credits to your OpenAI account ($5 minimum): https://platform.openai.com/settings/organization/billing/overview
-   - Add your key to `server/.env`:
-     ```
-     OPENAI_API_KEY=sk-your-key-here
-     ```
+   ```bash
+   cp ../.env.example .env
+   ```
+   
+   Then edit `server/.env` and add your OpenAI API key:
+   - Get your API key from: https://platform.openai.com/api-keys
+   - Add credits ($5 minimum): https://platform.openai.com/settings/organization/billing/overview
 
 > **Note:** OpenAI charges ~$0.002 per summary (GPT-3.5-turbo). $5 = ~2,500 summaries.
 
 ### Running the Project
 
 1. Start the server:
-   ```
+   ```bash
    cd server
    npm start
    ```
 
 2. Load the Chrome extension:
-   - Open Chrome and navigate to `chrome://extensions/`.
-   - Enable "Developer mode".
-   - Click "Load unpacked" and select the `extension` directory.
+   - Open Chrome and navigate to `chrome://extensions/`
+   - Enable "Developer mode"
+   - Click "Load unpacked" and select the `extension` directory
 
-3. Use the extension:
-   - Click on the ChatterPing icon in the Chrome toolbar to open the popup and view the latest summaries.
+3. Configure the extension:
+   - Click on the ChatterPing icon in the Chrome toolbar
+   - Go to the **Settings** tab
+   - Enter your target keyword and save
 
 ## Contributing
 
