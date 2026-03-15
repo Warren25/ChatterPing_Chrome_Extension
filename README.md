@@ -113,6 +113,10 @@ Chrome Web Store data disclosure worksheet:
 
 - [CWS_DATA_DISCLOSURE.md](CWS_DATA_DISCLOSURE.md)
 
+Chrome Web Store listing copy helper:
+
+- [CWS_LISTING_COPY.md](CWS_LISTING_COPY.md)
+
 ## Contributing
 
 Contributions are welcome! Please follow these steps:
