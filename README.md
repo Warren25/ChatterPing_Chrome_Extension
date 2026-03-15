@@ -109,6 +109,10 @@ The policy source file in this repository is:
 
 - [PRIVACY_POLICY.md](PRIVACY_POLICY.md)
 
+Chrome Web Store data disclosure worksheet:
+
+- [CWS_DATA_DISCLOSURE.md](CWS_DATA_DISCLOSURE.md)
+
 ## Contributing
 
 Contributions are welcome! Please follow these steps:
