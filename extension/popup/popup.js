@@ -45,9 +45,23 @@ function switchTab(tabName) {
     });
 }
 
+function renderSummaryWithFade(summaryElement, content, asHtml = false) {
+    summaryElement.classList.remove('summary-fade-in');
+    if (asHtml) {
+        summaryElement.innerHTML = content;
+    } else {
+        summaryElement.textContent = content;
+    }
+
+    // Force reflow so repeated loads retrigger the animation.
+    void summaryElement.offsetWidth;
+    summaryElement.classList.add('summary-fade-in');
+}
+
 // ============== SUMMARY TAB ==============
 
-async function loadSummary() {
+async function loadSummary(options = {}) {
+    const { animateRefresh = false } = options;
     const summaryElement = document.getElementById('summary');
     const badgeElement = document.getElementById('badge');
     const todayCountElement = document.getElementById('today-count');
@@ -72,7 +86,20 @@ async function loadSummary() {
     // Update keyword badge in UI
     if (keywordBadge) {
         keywordBadge.textContent = keyword.toUpperCase();
+        keywordBadge.classList.add('loading');
     }
+
+    summaryElement.classList.add('is-loading');
+    if (animateRefresh) {
+        summaryElement.classList.add('is-refreshing');
+    }
+    summaryElement.innerHTML = `
+        <div class="loading-spinner"></div>
+        <div class="summary-loading-copy">
+            <p><strong>Refreshing summary for ${escapeHtml(keyword)}...</strong></p>
+            <p>Fetching fresh mentions and generating a new AI summary.</p>
+        </div>
+    `;
 
     // Fetch summary from the server
     try {
@@ -81,20 +108,24 @@ async function loadSummary() {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        summaryElement.textContent = data.summary;
+        summaryElement.classList.remove('is-loading', 'is-refreshing');
+        renderSummaryWithFade(summaryElement, data.summary);
         
         const mentionCount = data.mentionCount || 0;
         badgeElement.textContent = mentionCount;
         todayCountElement.textContent = mentionCount;
+        if (keywordBadge) keywordBadge.classList.remove('loading');
     } catch (error) {
+        summaryElement.classList.remove('is-loading', 'is-refreshing');
+        if (keywordBadge) keywordBadge.classList.remove('loading');
         if (syncIndicator) syncIndicator.style.display = 'none';
         if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
-            summaryElement.innerHTML = `
+            renderSummaryWithFade(summaryElement, `
                 <strong>Unable to connect</strong><br><br>
                 Please check your internet connection and try again.
-            `;
+            `, true);
         } else {
-            summaryElement.textContent = 'Something went wrong. Please try again later.';
+            renderSummaryWithFade(summaryElement, 'Something went wrong. Please try again later.');
         }
         badgeElement.textContent = '—';
         todayCountElement.textContent = '—';
@@ -227,6 +258,9 @@ async function handleSettingsSave(event) {
     event.preventDefault();
     
     try {
+        const currentSettings = await chrome.storage.sync.get(['keyword']);
+        const previousKeyword = (currentSettings.keyword || '').trim();
+
         const settings = {
             keyword: document.getElementById('keyword-input').value.trim(),
             checkInterval: parseInt(document.getElementById('checkInterval').value),
@@ -240,12 +274,14 @@ async function handleSettingsSave(event) {
 
         await chrome.storage.sync.set(settings);
         showSettingsStatus('Settings saved!', 'success');
+
+        const keywordChanged = previousKeyword.toLowerCase() !== settings.keyword.toLowerCase();
         
         // Refresh summary with new keyword
         setTimeout(() => {
             switchTab('summary');
-            loadSummary();
-        }, 1000);
+            loadSummary({ animateRefresh: keywordChanged });
+        }, 500);
     } catch (error) {
         console.error('Error saving settings:', error);
         showSettingsStatus('Error: ' + error.message, 'error');
