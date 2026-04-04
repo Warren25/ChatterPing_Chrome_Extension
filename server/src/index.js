@@ -24,9 +24,6 @@ const corsOptions = {
     
     if (!origin || allowedPatterns.some(pattern => pattern.test(origin))) {
       callback(null, true);
-    } else if (NODE_ENV === 'production') {
-      // In production, also allow your specific domains if needed
-      callback(null, true);  // Be more permissive for Chrome extensions
     } else {
       callback(new Error('Not allowed by CORS'));
     }
