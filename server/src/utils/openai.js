@@ -27,7 +27,7 @@ Keep the summary under 100 words.`;
 
     try {
         const response = await axios.post(openaiUrl, {
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-4o-mini',
             messages: [
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: userPrompt }
