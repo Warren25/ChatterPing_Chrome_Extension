@@ -7,6 +7,8 @@ jest.mock('../../server/src/reddit', () => ({
 const { fetchMentions } = require('../../server/src/reddit');
 const app = require('../../server/src/index');
 
+const API_KEY = process.env.CHATTERPING_API_KEY;
+
 const mockMentions = [
   {
     id: 'debug-post-1',
@@ -35,8 +37,17 @@ describe('GET /', () => {
 });
 
 describe('GET /debug/reddit', () => {
+  test('should return 401 when API key is missing', async () => {
+    const response = await request(app).get('/debug/reddit').query({ keyword: 'Test' });
+
+    expect(response.status).toBe(401);
+    expect(response.body.error).toMatch(/Unauthorized/);
+  });
+
   test('should return 400 when keyword query param is missing', async () => {
-    const response = await request(app).get('/debug/reddit');
+    const response = await request(app)
+      .get('/debug/reddit')
+      .set('x-api-key', API_KEY);
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ error: 'Keyword parameter is required' });
@@ -47,6 +58,7 @@ describe('GET /debug/reddit', () => {
 
     const response = await request(app)
       .get('/debug/reddit')
+      .set('x-api-key', API_KEY)
       .query({ keyword: 'ChatterPing' });
 
     expect(response.status).toBe(200);
@@ -75,6 +87,7 @@ describe('GET /debug/reddit', () => {
 
     const response = await request(app)
       .get('/debug/reddit')
+      .set('x-api-key', API_KEY)
       .query({ keyword: 'ChatterPing' });
 
     expect(response.status).toBe(500);

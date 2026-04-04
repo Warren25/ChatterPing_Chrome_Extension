@@ -37,6 +37,21 @@ console.log(`Server running in ${NODE_ENV} mode`);
 
 app.use(express.json());
 
+// API key authentication middleware for protected endpoints
+const CHATTERPING_API_KEY = process.env.CHATTERPING_API_KEY;
+
+function requireApiKey(req, res, next) {
+  if (!CHATTERPING_API_KEY) {
+    // If no key is configured, skip auth (development convenience)
+    return next();
+  }
+  const provided = req.headers['x-api-key'];
+  if (provided !== CHATTERPING_API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized: invalid or missing API key' });
+  }
+  next();
+}
+
 // Root route
 app.get('/', (req, res) => {
   res.json({ 
@@ -54,7 +69,7 @@ app.get('/health', (req, res) => {
 });
 
 // Debug endpoint to see raw Reddit data
-app.get('/debug/reddit', async (req, res) => {
+app.get('/debug/reddit', requireApiKey, async (req, res) => {
   try {
     const keyword = req.query.keyword;
     if (!keyword) {
@@ -86,7 +101,7 @@ app.get('/debug/reddit', async (req, res) => {
 });
 
 // Updated /summarize endpoint
-app.get('/summarize', async (req, res) => {
+app.get('/summarize', requireApiKey, async (req, res) => {
   try {
     // Fetch mentions for user's keyword
     const keyword = req.query.keyword;

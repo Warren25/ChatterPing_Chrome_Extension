@@ -55,7 +55,9 @@ function checkForMentions() {
             return;
         }
 
-        fetch(`${API_URL}/summarize?keyword=${encodeURIComponent(keyword)}`)
+        fetch(`${API_URL}/summarize?keyword=${encodeURIComponent(keyword)}`, {
+            headers: API_HEADERS
+        })
         .then(response => {
             if (!response.ok) {
                 throw new Error(`Mention check failed with status ${response.status}`);

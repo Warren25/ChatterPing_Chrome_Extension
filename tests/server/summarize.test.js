@@ -12,6 +12,8 @@ const { fetchMentions } = require('../../server/src/reddit');
 const { generateSummary } = require('../../server/src/utils/openai');
 const app = require('../../server/src/index');
 
+const API_KEY = process.env.CHATTERPING_API_KEY;
+
 const mockMentions = [
   {
     id: 'post-1',
@@ -38,8 +40,17 @@ const mockMentions = [
 ];
 
 describe('GET /summarize', () => {
+  test('should return 401 when API key is missing', async () => {
+    const response = await request(app).get('/summarize').query({ keyword: 'Test' });
+
+    expect(response.status).toBe(401);
+    expect(response.body.error).toMatch(/Unauthorized/);
+  });
+
   test('should return 400 when keyword query param is missing', async () => {
-    const response = await request(app).get('/summarize');
+    const response = await request(app)
+      .get('/summarize')
+      .set('x-api-key', API_KEY);
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ error: 'Keyword parameter is required' });
@@ -51,6 +62,7 @@ describe('GET /summarize', () => {
 
     const response = await request(app)
       .get('/summarize')
+      .set('x-api-key', API_KEY)
       .query({ keyword: 'ChatterPing' });
 
     expect(response.status).toBe(200);
@@ -70,6 +82,7 @@ describe('GET /summarize', () => {
 
     const response = await request(app)
       .get('/summarize')
+      .set('x-api-key', API_KEY)
       .query({ keyword: 'NoSuchKeyword' });
 
     expect(response.status).toBe(200);
@@ -87,6 +100,7 @@ describe('GET /summarize', () => {
 
     const response = await request(app)
       .get('/summarize')
+      .set('x-api-key', API_KEY)
       .query({ keyword: 'ChatterPing' });
 
     expect(response.status).toBe(500);
@@ -100,6 +114,7 @@ describe('GET /summarize', () => {
 
     const response = await request(app)
       .get('/summarize')
+      .set('x-api-key', API_KEY)
       .query({ keyword: 'ChatterPing' });
 
     expect(response.status).toBe(500);
