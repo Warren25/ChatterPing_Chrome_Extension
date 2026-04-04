@@ -43,7 +43,7 @@ describe('GET /debug/reddit', () => {
   });
 
   test('should return transformed debug payload when mentions are found', async () => {
-    fetchMentions.mockResolvedValue(mockMentions);
+    fetchMentions.mockResolvedValue({ mentions: mockMentions, mock: false, reason: null });
 
     const response = await request(app)
       .get('/debug/reddit')

@@ -46,7 +46,7 @@ describe('GET /summarize', () => {
   });
 
   test('should return summary payload when mentions are found', async () => {
-    fetchMentions.mockResolvedValue(mockMentions);
+    fetchMentions.mockResolvedValue({ mentions: mockMentions, mock: false, reason: null });
     generateSummary.mockResolvedValue('Positive momentum with a few reliability concerns.');
 
     const response = await request(app)
@@ -66,7 +66,7 @@ describe('GET /summarize', () => {
   });
 
   test('should return no-mentions response when mentions array is empty', async () => {
-    fetchMentions.mockResolvedValue([]);
+    fetchMentions.mockResolvedValue({ mentions: [], mock: true, reason: 'No mentions found' });
 
     const response = await request(app)
       .get('/summarize')
@@ -95,7 +95,7 @@ describe('GET /summarize', () => {
   });
 
   test('should return 500 when summary generation fails', async () => {
-    fetchMentions.mockResolvedValue(mockMentions);
+    fetchMentions.mockResolvedValue({ mentions: mockMentions, mock: false, reason: null });
     generateSummary.mockRejectedValue(new Error('OpenAI timeout'));
 
     const response = await request(app)

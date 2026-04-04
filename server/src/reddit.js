@@ -10,17 +10,28 @@ async function fetchMentions(keyword) {
         // If no results found (possibly due to Reddit blocking cloud IPs), use mock data
         if (mentions.length === 0) {
             console.log('No Reddit results found (may be blocked), using mock data');
-            return generateMockData(keyword);
+            return {
+                mentions: [],
+                mock: true,
+                reason: 'No Reddit mentions found for the subject or Reddit API may be blocked.'
+            };
         }
         
-        return mentions;
+        return {
+            mentions,
+            mock: false,
+            reason: null
+        };
 
     } catch (error) {
         console.error('Error fetching Reddit mentions:', error.message);
-        
         // Fallback to mock data if Reddit API fails
         console.log('Falling back to mock data');
-        return generateMockData(keyword);
+        return {
+            mentions: [],
+            mock: true,
+            reason: 'Error fetching Reddit mentions or server issue.'
+        };
     }
 }
 

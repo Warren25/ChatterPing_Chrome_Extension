@@ -63,7 +63,7 @@ app.get('/debug/reddit', async (req, res) => {
     if (!keyword) {
       return res.status(400).json({ error: 'Keyword parameter is required' });
     }
-    const mentions = await fetchMentions(keyword);
+    const { mentions } = await fetchMentions(keyword);
     
     res.json({
       keyword: keyword,
@@ -96,7 +96,7 @@ app.get('/summarize', async (req, res) => {
     if (!keyword) {
       return res.status(400).json({ error: 'Keyword parameter is required' });
     }
-    const mentions = await fetchMentions(keyword);
+    const { mentions } = await fetchMentions(keyword);
     
     if (mentions.length === 0) {
       return res.json({ 
