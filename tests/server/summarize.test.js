@@ -63,7 +63,11 @@ describe('GET /summarize', () => {
 
   test('should return summary payload when mentions are found', async () => {
     fetchMentions.mockResolvedValue({ mentions: mockMentions, mock: false, reason: null });
-    generateSummary.mockResolvedValue('Positive momentum with a few reliability concerns.');
+    generateSummary.mockResolvedValue({
+      summary: 'Positive momentum with a few reliability concerns.',
+      sentimentScore: 7.2,
+      sentimentLabel: 'positive'
+    });
 
     const response = await request(app)
       .get('/summarize')
@@ -75,6 +79,8 @@ describe('GET /summarize', () => {
     expect(generateSummary).toHaveBeenCalledWith(mockMentions, 'ChatterPing');
 
     expect(response.body.summary).toBe('Positive momentum with a few reliability concerns.');
+    expect(response.body.sentimentScore).toBe(7.2);
+    expect(response.body.sentimentLabel).toBe('positive');
     expect(response.body.mentionCount).toBe(2);
     expect(response.body.keyword).toBe('ChatterPing');
     expect(response.body.lastUpdated).toBeDefined();

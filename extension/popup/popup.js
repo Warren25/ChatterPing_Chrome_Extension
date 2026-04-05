@@ -36,6 +36,23 @@ async function getKeywords() {
     return data.keywords;
 }
 
+// ============== LOCAL DATA PERSISTENCE ==============
+
+function localCacheKey(prefix, keyword) {
+    return `${prefix}:${keyword.toLowerCase()}`;
+}
+
+async function getLocalCache(prefix, keyword) {
+    const key = localCacheKey(prefix, keyword);
+    const data = await chrome.storage.local.get(key);
+    return data[key] || null;
+}
+
+async function setLocalCache(prefix, keyword, value) {
+    const key = localCacheKey(prefix, keyword);
+    await chrome.storage.local.set({ [key]: { ...value, cachedAt: Date.now() } });
+}
+
 function setVersionLabel() {
     const versionLabel = document.getElementById('app-version');
     if (!versionLabel) return;
@@ -85,6 +102,23 @@ function renderSummaryWithFade(summaryElement, content, asHtml = false) {
     // Force reflow so repeated loads retrigger the animation.
     void summaryElement.offsetWidth;
     summaryElement.classList.add('summary-fade-in');
+}
+
+function updateSentimentDisplay(score, label) {
+    const row = document.getElementById('sentiment-row');
+    const scoreEl = document.getElementById('sentiment-score');
+    const labelEl = document.getElementById('sentiment-label');
+    if (!row || !scoreEl || !labelEl) return;
+
+    if (score == null || label == null) {
+        row.style.display = 'none';
+        return;
+    }
+
+    row.style.display = 'flex';
+    scoreEl.textContent = `${Number(score).toFixed(1)}/10`;
+    labelEl.textContent = label.charAt(0).toUpperCase() + label.slice(1);
+    labelEl.className = 'sentiment-label sentiment-' + label.replace(/\s+/g, '-');
 }
 
 // ============== KEYWORD SELECTOR ==============
@@ -162,13 +196,28 @@ async function loadSummary(options = {}) {
     if (animateRefresh) {
         summaryElement.classList.add('is-refreshing');
     }
-    summaryElement.innerHTML = `
-        <div class="loading-spinner"></div>
-        <div class="summary-loading-copy">
-            <p><strong>Refreshing summary for ${escapeHtml(keyword)}...</strong></p>
-            <p>Fetching fresh mentions and generating a new AI summary.</p>
-        </div>
-    `;
+
+    // Show cached data immediately if available
+    const cached = await getLocalCache('summary', keyword);
+    if (cached) {
+        summaryElement.classList.remove('is-loading', 'is-refreshing');
+        renderSummaryWithFade(summaryElement, cached.summary);
+        badgeElement.textContent = cached.mentionCount || 0;
+        todayCountElement.textContent = cached.mentionCount || 0;
+        updateSentimentDisplay(cached.sentimentScore, cached.sentimentLabel);
+        if (keywordBadge) {
+            keywordBadge.textContent = keyword.toUpperCase();
+            keywordBadge.classList.remove('loading');
+        }
+    } else {
+        summaryElement.innerHTML = `
+            <div class="loading-spinner"></div>
+            <div class="summary-loading-copy">
+                <p><strong>Refreshing summary for ${escapeHtml(keyword)}...</strong></p>
+                <p>Fetching fresh mentions and generating a new AI summary.</p>
+            </div>
+        `;
+    }
 
     // Fetch summary from the server
     try {
@@ -185,11 +234,22 @@ async function loadSummary(options = {}) {
         const mentionCount = data.mentionCount || 0;
         badgeElement.textContent = mentionCount;
         todayCountElement.textContent = mentionCount;
+        updateSentimentDisplay(data.sentimentScore, data.sentimentLabel);
         if (keywordBadge) keywordBadge.classList.remove('loading');
+
+        // Persist to local storage for instant display next time
+        await setLocalCache('summary', keyword, {
+            summary: data.summary,
+            mentionCount,
+            sentimentScore: data.sentimentScore,
+            sentimentLabel: data.sentimentLabel
+        });
     } catch (error) {
         summaryElement.classList.remove('is-loading', 'is-refreshing');
         if (keywordBadge) keywordBadge.classList.remove('loading');
         if (syncIndicator) syncIndicator.style.display = 'none';
+        // If we already showed cached data, don't overwrite with error
+        if (cached) return;
         if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
             renderSummaryWithFade(summaryElement, `
                 <strong>Unable to connect</strong><br><br>
@@ -233,6 +293,8 @@ async function loadDetails() {
     loadingEl.style.display = 'block';
     contentEl.style.display = 'none';
     errorEl.style.display = 'none';
+
+    let showedCache = false;
     
     try {
         const keyword = selectedKeyword || keywords[0];
@@ -243,6 +305,13 @@ async function loadDetails() {
             errorEl.style.display = 'block';
             return;
         }
+
+        // Show cached details immediately if available
+        const cached = await getLocalCache('details', keyword);
+        if (cached && cached.posts) {
+            showedCache = true;
+            renderDetailsContent(cached, keyword, { totalCountEl, keywordEl, mentionsListEl, contentEl, loadingEl });
+        }
         
         const response = await fetch(`${API_URL}/debug/reddit?keyword=${encodeURIComponent(keyword)}`, {
             headers: API_HEADERS
@@ -250,35 +319,50 @@ async function loadDetails() {
         if (!response.ok) throw new Error('Failed to fetch');
         
         const data = await response.json();
+
+        // Save to local cache
+        await setLocalCache('details', keyword, data);
         
-        // Hide loading, show content
-        loadingEl.style.display = 'none';
-        contentEl.style.display = 'block';
-        
-        // Update stats
-        totalCountEl.textContent = data.count || 0;
-        keywordEl.textContent = data.keyword || keyword;
-        
-        // Populate mentions
-        if (data.posts && data.posts.length > 0) {
-            mentionsListEl.innerHTML = data.posts.map(post => `
-                <div class="mention-card">
-                    <div class="mention-title">${escapeHtml(post.title)}</div>
-                    <div class="mention-meta">
-                        <span>r/${escapeHtml(post.subreddit)}</span>
-                        <span class="mention-score">↑ ${post.score}</span>
-                        <span>${formatDate(post.createdAt)}</span>
-                    </div>
-                    <a href="${post.url}" target="_blank" class="mention-link">View on Reddit →</a>
-                </div>
-            `).join('');
-        } else {
-            mentionsListEl.innerHTML = '<p style="color: #64748b; text-align: center; padding: 20px;">No mentions found</p>';
-        }
+        renderDetailsContent(data, keyword, { totalCountEl, keywordEl, mentionsListEl, contentEl, loadingEl });
     } catch (error) {
         console.error('Error loading details:', error);
         loadingEl.style.display = 'none';
-        errorEl.style.display = 'block';
+        if (!showedCache) {
+            if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
+                errorEl.innerHTML = '<p>Unable to reach the ChatterPing server</p><p style="font-size:12px;color:#64748b;margin-top:6px;">Check your internet connection or try again later.</p><button class="btn btn-primary" id="retry-details-btn" style="margin-top:12px;">Retry</button>';
+            } else {
+                errorEl.innerHTML = '<p>Unable to load mentions</p><button class="btn btn-primary" id="retry-details-btn" style="margin-top:12px;">Retry</button>';
+            }
+            errorEl.style.display = 'block';
+            const retryBtn = errorEl.querySelector('#retry-details-btn');
+            if (retryBtn) retryBtn.addEventListener('click', () => loadDetails());
+        }
+    }
+}
+
+function renderDetailsContent(data, keyword, els) {
+    const { totalCountEl, keywordEl, mentionsListEl, contentEl, loadingEl } = els;
+
+    loadingEl.style.display = 'none';
+    contentEl.style.display = 'block';
+    
+    totalCountEl.textContent = data.count || 0;
+    keywordEl.textContent = data.keyword || keyword;
+    
+    if (data.posts && data.posts.length > 0) {
+        mentionsListEl.innerHTML = data.posts.map(post => `
+            <div class="mention-card">
+                <div class="mention-title">${escapeHtml(post.title)}</div>
+                <div class="mention-meta">
+                    <span>r/${escapeHtml(post.subreddit)}</span>
+                    <span class="mention-score">↑ ${post.score}</span>
+                    <span>${formatDate(post.createdAt)}</span>
+                </div>
+                <a href="${post.url}" target="_blank" class="mention-link">View on Reddit →</a>
+            </div>
+        `).join('');
+    } else {
+        mentionsListEl.innerHTML = '<p style="color: #64748b; text-align: center; padding: 20px;">No mentions found</p>';
     }
 }
 

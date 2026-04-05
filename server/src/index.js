@@ -11,6 +11,12 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 const app = express();
 
+// Trust first proxy (Render, Railway, etc.) so express-rate-limit
+// can read the real client IP from X-Forwarded-For.
+if (NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // CORS configuration for development and production
 const corsOptions = {
   origin: (origin, callback) => {
@@ -162,10 +168,12 @@ app.get('/summarize', apiLimiter, requireApiKey, async (req, res) => {
     }
 
     // Generate AI summary
-    const summary = await generateSummary(mentions, keyword);
+    const result = await generateSummary(mentions, keyword);
     
     const response = {
-      summary: summary,
+      summary: result.summary,
+      sentimentScore: result.sentimentScore,
+      sentimentLabel: result.sentimentLabel,
       mentionCount: mentions.length,
       keyword: keyword,
       lastUpdated: new Date().toISOString(),
