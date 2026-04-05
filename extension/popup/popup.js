@@ -252,12 +252,18 @@ async function loadSummary(options = {}) {
         if (cached) return;
         if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
             renderSummaryWithFade(summaryElement, `
-                <strong>Unable to connect</strong><br><br>
-                Please check your internet connection and try again.
+                <p>Unable to reach the ChatterPing server</p>
+                <p style="font-size:12px;color:#64748b;margin-top:6px;">Check your internet connection or try again later.</p>
+                <button class="btn btn-primary" id="retry-summary-btn" style="margin-top:12px;">Retry</button>
             `, true);
         } else {
-            renderSummaryWithFade(summaryElement, 'Something went wrong. Please try again later.');
+            renderSummaryWithFade(summaryElement, `
+                <p>Something went wrong</p>
+                <button class="btn btn-primary" id="retry-summary-btn" style="margin-top:12px;">Retry</button>
+            `, true);
         }
+        const retryBtn = summaryElement.querySelector('#retry-summary-btn');
+        if (retryBtn) retryBtn.addEventListener('click', () => loadSummary());
         badgeElement.textContent = '—';
         todayCountElement.textContent = '—';
     }

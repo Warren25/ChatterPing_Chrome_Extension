@@ -120,6 +120,20 @@ All 7 bugs fixed, all dead code removed. See "Phase 0 — Resolved" section abov
 19. Actionable AI recommendations (suggested responses, trend explanations)
 20. Export/share reports (PDF or CSV)
 
+### KTLO — Keep The Lights On
+Operational health items that prevent outages, reduce debugging time, and keep the project maintainable.
+
+| # | Item | Why |
+|---|------|-----|
+| K1 | **Structured server logging** | Replace raw `console.*` with a leveled logger (pino/winston). Add request logging middleware (method, path, status, duration). JSON format for Render log search. Configurable level per env (warn in prod, debug in dev). |
+| K2 | **Request tracing / correlation IDs** | Attach a unique ID to each inbound request so reddit fetch → OpenAI call → response can be traced end-to-end in logs. |
+| K3 | **Client-side error reporting** | Extension errors are invisible to us today. Add lightweight error capture (e.g., Sentry free tier or a simple POST-to-server endpoint) so production popup/background crashes are surfaced. |
+| K4 | **Dependency updates & audit** | Run `npm audit` and `npm outdated` on a schedule. Pin major versions. The express-rate-limit breaking change (trust proxy) was a warning sign. |
+| K5 | **Server health monitoring** | Add uptime check (e.g., UptimeRobot free tier) pinging `/health`. Get alerted when Render cold-starts take too long or the service goes down. |
+| K6 | **API key rotation procedure** | Document the key rotation steps (update Render env → update config.js → rebuild extension → push to CWS). The missed rotation in this session shows the gap. |
+| K7 | **Render cold-start mitigation** | Free-tier Render spins down after inactivity. Add a keep-alive cron ping or document the expected 10-15s cold-start latency for users. |
+| K8 | **Test coverage for extension** | Currently 0 extension tests. Add basic JS unit tests for `migrateKeywordStorage`, `getLocalCache`/`setLocalCache`, and `escapeHtml` with a lightweight test runner. |
+
 ## Notes
 - Complexity scores: 1 (easy) to 5 (hard)
 - Risks include technical, legal, and user experience challenges
