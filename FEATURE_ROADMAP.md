@@ -1,6 +1,6 @@
 # ChatterPing Value & Feature Roadmap
 
-## Current State (v0.1.1 — Phase 0 Complete)
+## Current State (v1.1.0 — Phase 1 Complete)
 
 ChatterPing is a Chrome extension + Express backend that monitors Reddit for a
 single user-configured keyword, fetches recent mentions, and generates an
@@ -102,12 +102,12 @@ AI-powered sentiment summary via OpenAI GPT-4o-mini.
 ### Phase 0 — Stabilize ✅ Complete
 All 7 bugs fixed, all dead code removed. See "Phase 0 — Resolved" section above.
 
-### Phase 1 — Core Value (make it actually useful) ← **YOU ARE HERE**
-9. Multi-keyword support (track 3-5 keywords simultaneously)
-10. Local data persistence (cache summaries + mention snapshots in chrome.storage.local)
-11. Keyword-level sentiment scoring (not just text summary — numerical scores over time)
-12. Improve Details tab error UX
-13. Build-time environment config (replace hardcoded USE_PRODUCTION toggle)
+### Phase 1 — Core Value (make it actually useful) ✅ Complete
+9. ~~Multi-keyword support (track 3-5 keywords simultaneously)~~
+10. ~~Local data persistence (cache summaries + mention snapshots in chrome.storage.local)~~
+11. ~~Keyword-level sentiment scoring (not just text summary — numerical scores over time)~~
+12. ~~Improve Details tab error UX~~
+13. ~~Build-time environment config (replace hardcoded USE_PRODUCTION toggle)~~
 
 ### Phase 2 — Differentiation (things competitors don't do well)
 14. Historical trend tracking with simple sparkline visualizations
@@ -138,5 +138,6 @@ Operational health items that prevent outages, reduce debugging time, and keep t
 - Complexity scores: 1 (easy) to 5 (hard)
 - Risks include technical, legal, and user experience challenges
 - Multi-platform integration is the most complex due to API access, legal risks, and ongoing maintenance
-- Phase 0 completed April 2026
+- Phase 0 completed March 2026
+- Phase 1 completed April 2026
 - Start with low-complexity, high-impact features for fastest value

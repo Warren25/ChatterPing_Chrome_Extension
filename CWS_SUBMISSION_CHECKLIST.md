@@ -11,10 +11,14 @@ Use this checklist every time you submit or update the extension on the Chrome W
 - [ ] Run server tests: `cd server && npm test` → all tests pass
 - [ ] Load the extension locally (Chrome → `chrome://extensions` → Load unpacked → `extension/`) and smoke-test:
   - [ ] Enter a keyword and save settings
+  - [ ] Add multiple keywords (up to 5) and verify pill selectors appear
   - [ ] Summary loads with no console errors
+  - [ ] Sentiment score and label display below AI Summary
   - [ ] Badge count updates after polling interval
   - [ ] Version label in popup matches manifest version
   - [ ] Details tab populates correctly
+  - [ ] Cached data persists when closing and reopening popup
+  - [ ] Error states show styled message with Retry button
 
 ---
 

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "ChatterPing",
-  "version": "1.0.0",
-  "description": "AI-powered browser extension that monitors online chatter for a keyword, summarizes the latest opinions, and notifies the user.",
+  "version": "1.1.0",
+  "description": "AI-powered browser extension that monitors Reddit mentions for up to 5 keywords, with sentiment scoring and AI summaries.",
   "permissions": [
     "storage",
     "alarms"
