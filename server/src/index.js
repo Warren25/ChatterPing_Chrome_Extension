@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const { fetchMentions } = require('./reddit');
@@ -52,6 +53,15 @@ function requireApiKey(req, res, next) {
   next();
 }
 
+// Rate limiting: 20 requests per minute per IP for protected endpoints
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please try again later' },
+});
+
 // Root route
 app.get('/', (req, res) => {
   res.json({ 
@@ -69,7 +79,7 @@ app.get('/health', (req, res) => {
 });
 
 // Debug endpoint to see raw Reddit data
-app.get('/debug/reddit', requireApiKey, async (req, res) => {
+app.get('/debug/reddit', apiLimiter, requireApiKey, async (req, res) => {
   try {
     const keyword = req.query.keyword;
     if (!keyword) {
@@ -101,7 +111,7 @@ app.get('/debug/reddit', requireApiKey, async (req, res) => {
 });
 
 // Updated /summarize endpoint
-app.get('/summarize', requireApiKey, async (req, res) => {
+app.get('/summarize', apiLimiter, requireApiKey, async (req, res) => {
   try {
     // Fetch mentions for user's keyword
     const keyword = req.query.keyword;
