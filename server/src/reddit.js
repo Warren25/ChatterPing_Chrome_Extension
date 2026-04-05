@@ -163,4 +163,4 @@ function strictFilter(mentions, keyword) {
     });
 }
 
-module.exports = { fetchMentions };
+module.exports = { fetchMentions, transformRedditData, removeDuplicates, strictFilter };
