@@ -1,43 +1,54 @@
 # ChatterPing Value & Feature Roadmap
 
-## Current State (v0.1.0 — Published on Chrome Web Store)
+## Current State (v0.1.1 — Phase 0 Complete)
 
 ChatterPing is a Chrome extension + Express backend that monitors Reddit for a
 single user-configured keyword, fetches recent mentions, and generates an
-AI-powered sentiment summary via OpenAI GPT-3.5-turbo.
+AI-powered sentiment summary via OpenAI GPT-4o-mini.
 
 ### What Works
 - Keyword configuration via Settings tab (stored in chrome.storage.sync)
 - Multi-strategy Reddit search with camelCase variation handling & deduplication
-- AI-generated sentiment summaries with fallback when OpenAI key is missing
+- AI-generated sentiment summaries (GPT-4o-mini) with fallback when key is missing
 - Tabbed popup UI (Summary, Details, Settings) with loading states
 - Background service worker badge updates on an alarm interval
 - XSS protection via escapeHtml() in popup rendering
-- Jest + Supertest server tests with mocked external dependencies
+- CORS locked to extension + localhost origins only
+- API key authentication on all protected endpoints
+- Rate limiting (20 req/min/IP) on protected endpoints
+- In-memory response cache with 5-minute TTL
+- Jest + Supertest server tests (16 tests) with mocked external dependencies
 - CWS submission docs (privacy policy, data disclosure, listing copy)
+- Deployed on Render with env-var secrets management
 
 ---
 
-## Critical Bugs (must fix before any new features)
+## Phase 0 — Resolved (all items fixed and shipped)
 
-| # | Bug | Location | Impact |
-|---|-----|----------|--------|
-| B1 | **`fetchMentions` return-type mismatch** — returns `{ mentions, mock, reason }` object, but `index.js` treats it as a flat array (`.length`, `.slice`, `.map`). Summarize and debug/reddit endpoints are silently broken. | `server/src/reddit.js` → `server/src/index.js` | **P0 — live breakage** |
-| B2 | **CORS wide-open in production** — production branch does `callback(null, true)` for every origin. Any website can call the API. | `server/src/index.js` L30-33 | Security |
-| B3 | **No rate limiting** — every request triggers Reddit fetch + OpenAI call. API credits can be drained trivially. | `server/src/index.js` | Cost / abuse |
-| B4 | **No authentication** — nothing ties requests to legitimate ChatterPing users. | `server/src/index.js` | Security / cost |
-| B5 | **No response caching** — popup open, alarm tick, and Details tab each fire fresh upstream calls for the same data. | server + extension | Performance / cost |
-| B6 | **Double-fetch on install** — background.js fires `checkForMentions()` on both `onInstalled` and script load, plus popup fires its own call. | `extension/scripts/background.js` | Wasted API calls |
-| B7 | **GPT-3.5-turbo is deprecated** — model may stop working without notice. Migrate to a current model. | `server/src/utils/openai.js` | Reliability |
+<details>
+<summary>Bugs fixed</summary>
 
-## Dead Code to Remove
+| # | Bug | Fix |
+|---|-----|-----|
+| B1 | `fetchMentions` return-type mismatch | Destructured `{ mentions }` in index.js endpoints |
+| B2 | CORS wide-open in production | Removed permissive production branch; allowlist only |
+| B3 | No rate limiting | Added express-rate-limit (20 req/min/IP) |
+| B4 | No authentication | Added `requireApiKey` middleware + x-api-key header |
+| B5 | No response caching | In-memory Map cache with 5-min TTL |
+| B6 | Double-fetch on install | Removed standalone `checkForMentions()` call |
+| B7 | Deprecated GPT-3.5-turbo | Migrated to GPT-4o-mini |
 
-| Item | Location | Notes |
-|------|----------|-------|
-| `generateMockData()` | `server/src/reddit.js` | Defined but never called |
-| `searchSubreddit()` | `server/src/reddit.js` | Defined but never called |
-| Prisma `Mention` model | `server/prisma/schema.prisma` | Schema exists, nothing reads/writes it |
-| Content script | `extension/scripts/content.js` | Runs on every page, scans DOM, does nothing with results |
+</details>
+
+<details>
+<summary>Dead code removed</summary>
+
+- `generateMockData()` from reddit.js
+- `searchSubreddit()` from reddit.js
+- Prisma schema + prisma/sqlite3 deps
+- Placeholder content.js (no manifest reference)
+
+</details>
 
 ## Tech Debt & Improvements
 
@@ -88,17 +99,10 @@ AI-powered sentiment summary via OpenAI GPT-3.5-turbo.
 
 ## Ordered Implementation Roadmap
 
-### Phase 0 — Stabilize (fix before anything else)
-1. Fix `fetchMentions` return-type bug (B1)
-2. Add server-side response caching with TTL (B5)
-3. Add rate limiting (B3)
-4. Add basic API key auth for extension→server calls (B4)
-5. Tighten CORS to extension origins only (B2)
-6. Migrate to current OpenAI model (B7)
-7. Remove dead code (generateMockData, searchSubreddit, unused Prisma schema, content.js placeholder)
-8. Fix double-fetch on install (B6)
+### Phase 0 — Stabilize ✅ Complete
+All 7 bugs fixed, all dead code removed. See "Phase 0 — Resolved" section above.
 
-### Phase 1 — Core Value (make it actually useful)
+### Phase 1 — Core Value (make it actually useful) ← **YOU ARE HERE**
 9. Multi-keyword support (track 3-5 keywords simultaneously)
 10. Local data persistence (cache summaries + mention snapshots in chrome.storage.local)
 11. Keyword-level sentiment scoring (not just text summary — numerical scores over time)
@@ -120,5 +124,5 @@ AI-powered sentiment summary via OpenAI GPT-3.5-turbo.
 - Complexity scores: 1 (easy) to 5 (hard)
 - Risks include technical, legal, and user experience challenges
 - Multi-platform integration is the most complex due to API access, legal risks, and ongoing maintenance
-- **Phase 0 is non-negotiable** — the app has live bugs and security gaps that must be resolved first
+- Phase 0 completed April 2026
 - Start with low-complexity, high-impact features for fastest value
