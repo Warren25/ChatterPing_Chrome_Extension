@@ -331,7 +331,7 @@ async function loadDetails() {
         
         renderDetailsContent(data, keyword, { totalCountEl, keywordEl, mentionsListEl, contentEl, loadingEl });
     } catch (error) {
-        console.error('Error loading details:', error);
+        console.warn('Error loading details:', error.message);
         loadingEl.style.display = 'none';
         if (!showedCache) {
             if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
@@ -528,7 +528,7 @@ async function handleSettingsSave(event) {
             loadSummary({ animateRefresh: true });
         }, 500);
     } catch (error) {
-        console.error('Error saving settings:', error);
+        console.warn('Settings save blocked:', error.message);
         showSettingsStatus('Error: ' + error.message, 'error');
     }
 }

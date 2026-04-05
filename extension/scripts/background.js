@@ -84,7 +84,7 @@ function checkForMentions() {
                 totalMentions += mentionCount;
             })
             .catch(error => {
-                console.error(`Error checking mentions for "${keyword}":`, error);
+                console.warn(`Mention check failed for "${keyword}":`, error.message);
             })
             .finally(() => {
                 completed++;

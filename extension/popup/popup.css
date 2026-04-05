@@ -218,13 +218,13 @@ body {
     font-size: 13px;
     min-height: 80px;
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
     gap: 10px;
 }
 
 .summary-content p {
     margin: 0;
-    flex: 1;
 }
 
 .summary-content.is-loading {
