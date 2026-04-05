@@ -28,9 +28,20 @@ function scheduleAlarm(checkInterval) {
 chrome.runtime.onInstalled.addListener(() => {
     console.log('ChatterPing extension installed');
     
-    // Set default storage values (keyword left empty - user must configure)
+    // Migrate legacy single-keyword storage to keywords array
+    chrome.storage.sync.get(['keyword', 'keywords'], (data) => {
+        if (data.keyword && !data.keywords) {
+            chrome.storage.sync.set({ keywords: [data.keyword] }, () => {
+                chrome.storage.sync.remove('keyword');
+            });
+        }
+        if (!data.keywords && !data.keyword) {
+            chrome.storage.sync.set({ keywords: [] });
+        }
+    });
+
+    // Set default storage values
     chrome.storage.sync.set({
-        keyword: '',
         checkInterval: 30, // minutes
         lastCheck: Date.now()
     });
@@ -41,38 +52,48 @@ chrome.runtime.onInstalled.addListener(() => {
     checkForMentions();
 });
 
-// Periodic check for new mentions (example)
+// Periodic check for new mentions across all keywords
 function checkForMentions() {
-    chrome.storage.sync.get(['keyword', 'checkInterval'], (result) => {
-        const keyword = (result.keyword || '').trim();
+    chrome.storage.sync.get(['keywords', 'checkInterval'], (result) => {
+        const keywords = result.keywords || [];
         const checkInterval = parseInt(result.checkInterval, 10) || 30;
 
         scheduleAlarm(checkInterval);
 
-        if (!keyword) {
+        if (keywords.length === 0) {
             updateBadgeCount(0);
-            console.log('No keyword configured; skipping mention check');
+            console.log('No keywords configured; skipping mention check');
             return;
         }
 
-        fetch(`${API_URL}/summarize?keyword=${encodeURIComponent(keyword)}`, {
-            headers: API_HEADERS
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Mention check failed with status ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            const mentionCount = Number.isFinite(data.mentionCount) ? data.mentionCount : 0;
-            updateBadgeCount(mentionCount);
-            chrome.storage.sync.set({ lastCheck: Date.now() });
-            console.log(`Updated badge count to: ${mentionCount} for "${keyword}"`);
-        })
-        .catch(error => {
-            console.error('Error checking mentions:', error);
-            updateBadgeCount(0);
+        let totalMentions = 0;
+        let completed = 0;
+
+        keywords.forEach(keyword => {
+            fetch(`${API_URL}/summarize?keyword=${encodeURIComponent(keyword)}`, {
+                headers: API_HEADERS
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Mention check failed with status ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const mentionCount = Number.isFinite(data.mentionCount) ? data.mentionCount : 0;
+                totalMentions += mentionCount;
+            })
+            .catch(error => {
+                console.error(`Error checking mentions for "${keyword}":`, error);
+            })
+            .finally(() => {
+                completed++;
+                if (completed === keywords.length) {
+                    updateBadgeCount(totalMentions);
+                    chrome.storage.sync.set({ lastCheck: Date.now() });
+                    console.log(`Updated badge count to: ${totalMentions} across ${keywords.length} keyword(s)`);
+                }
+            });
         });
     });
 }
@@ -83,7 +104,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
         const interval = parseInt(changes.checkInterval.newValue, 10) || 30;
         scheduleAlarm(interval);
     }
-    if (areaName === 'sync' && changes.keyword) {
+    if (areaName === 'sync' && changes.keywords) {
         checkForMentions();
     }
 });

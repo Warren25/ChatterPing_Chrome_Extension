@@ -414,6 +414,113 @@ body {
     color: #ef4444;
 }
 
+/* Keyword Selector Pills (Summary & Details tabs) */
+.keyword-selector {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.kw-pill {
+    padding: 5px 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(102, 126, 234, 0.25);
+    background: white;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.kw-pill:hover {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.kw-pill.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-color: transparent;
+}
+
+/* Keyword Chips (Settings tab) */
+.keyword-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+    min-height: 4px;
+}
+
+.keyword-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #4338ca;
+}
+
+.chip-remove {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0 2px;
+    font-weight: 600;
+}
+
+.chip-remove:hover {
+    color: #ef4444;
+}
+
+.keyword-add-row {
+    display: flex;
+    gap: 8px;
+}
+
+.keyword-add-row input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.keyword-add-row input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-add-keyword {
+    flex: none;
+    padding: 10px 16px;
+}
+
+.btn-add-keyword:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.keyword-count {
+    font-weight: 400;
+    color: #94a3b8;
+}
+
 /* Settings Tab Styles */
 .form-group {
     margin-bottom: 16px;

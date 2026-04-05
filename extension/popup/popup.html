@@ -33,6 +33,8 @@
         <div class="tab-content">
             <!-- Summary Tab -->
             <div class="tab-pane active" id="tab-summary">
+                <div class="keyword-selector" id="summary-keyword-selector"></div>
+
                 <div class="stats-card">
                     <div class="stat-item">
                         <div class="stat-number" id="badge">0</div>
@@ -59,6 +61,7 @@
 
             <!-- Details Tab -->
             <div class="tab-pane" id="tab-details">
+                <div class="keyword-selector" id="details-keyword-selector"></div>
                 <div id="details-loading" class="details-loading">
                     <div class="spinner"></div>
                     <p>Loading mentions...</p>
@@ -90,9 +93,13 @@
 
                 <form id="settings-form">
                     <div class="form-group">
-                        <label for="keyword-input">Target Keyword</label>
-                        <input type="text" id="keyword-input" name="keyword" placeholder="e.g., Your Brand" required>
-                        <small>The keyword or brand name to monitor</small>
+                        <label>Target Keywords <small class="keyword-count" id="keyword-count">(0/5)</small></label>
+                        <div class="keyword-chips" id="keyword-chips"></div>
+                        <div class="keyword-add-row">
+                            <input type="text" id="keyword-input" name="keyword" placeholder="e.g., Your Brand" maxlength="50">
+                            <button type="button" class="btn btn-primary btn-add-keyword" id="add-keyword-btn">Add</button>
+                        </div>
+                        <small>Add up to 5 keywords or brand names to monitor</small>
                     </div>
 
                     <div class="form-group">
