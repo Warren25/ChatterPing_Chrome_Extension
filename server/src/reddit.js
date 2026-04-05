@@ -98,24 +98,6 @@ async function searchReddit(query, sort = 'new', limit = 10) {
     return transformRedditData(response.data.data.children);
 }
 
-async function searchSubreddit(keyword, subreddit, limit = 5) {
-    const searchUrl = `https://www.reddit.com/r/${subreddit}/search.json?q=${encodeURIComponent(keyword)}&sort=new&limit=${limit}&restrict_sr=on`;
-    
-    const response = await axios.get(searchUrl, {
-        headers: {
-            'User-Agent': 'ChatterPing/1.0 (Chrome Extension for keyword monitoring)',
-            'Accept': 'application/json'
-        }
-    });
-
-    // Check if we got HTML instead of JSON (blocked)
-    if (typeof response.data === 'string' && response.data.includes('<html')) {
-        throw new Error('Reddit API returned HTML (likely blocked)');
-    }
-
-    return transformRedditData(response.data.data.children);
-}
-
 function transformRedditData(children) {
     return children.map(post => {
         const data = post.data;
@@ -179,44 +161,6 @@ function strictFilter(mentions, keyword) {
         
         return true;
     });
-}
-
-function generateMockData(keyword) {
-    return [
-        {
-            id: 'mock-1',
-            title: `Discussion about ${keyword} - Community thoughts`,
-            url: 'https://www.reddit.com/r/discussion/comments/mock1',
-            excerpt: `I've been following ${keyword} for a while now and wanted to share my thoughts with the community. Overall impressions are positive...`,
-            subreddit: 'discussion',
-            author: 'community_member',
-            score: 42,
-            numComments: 15,
-            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
-        },
-        {
-            id: 'mock-2',
-            title: `${keyword} - What are your experiences?`,
-            url: 'https://www.reddit.com/r/AskReddit/comments/mock2',
-            excerpt: `Curious to hear what others think about ${keyword}. I've had mixed experiences and wanted to see if that's common...`,
-            subreddit: 'AskReddit',
-            author: 'curious_user',
-            score: 28,
-            numComments: 8,
-            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(), // 4 hours ago
-        },
-        {
-            id: 'mock-3',
-            title: `Latest news about ${keyword}`,
-            url: 'https://www.reddit.com/r/news/comments/mock3',
-            excerpt: `Just saw some interesting updates about ${keyword}. Thought the community would want to discuss...`,
-            subreddit: 'news',
-            author: 'news_watcher',
-            score: 15,
-            numComments: 6,
-            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(), // 6 hours ago
-        }
-    ];
 }
 
 module.exports = { fetchMentions };

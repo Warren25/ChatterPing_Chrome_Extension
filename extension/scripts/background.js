@@ -93,6 +93,3 @@ chrome.alarms.onAlarm.addListener((alarm) => {
         checkForMentions();
     }
 });
-
-// Do initial check when background script loads
-checkForMentions();
