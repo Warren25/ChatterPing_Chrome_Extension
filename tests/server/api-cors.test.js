@@ -6,8 +6,13 @@ jest.mock('../../server/src/reddit', () => ({
 
 const { fetchMentions } = require('../../server/src/reddit');
 const app = require('../../server/src/index');
+const { clearCache } = require('../../server/src/index');
 
 const API_KEY = process.env.CHATTERPING_API_KEY;
+
+beforeEach(() => {
+  clearCache();
+});
 
 const mockMentions = [
   {

@@ -11,8 +11,13 @@ jest.mock('../../server/src/utils/openai', () => ({
 const { fetchMentions } = require('../../server/src/reddit');
 const { generateSummary } = require('../../server/src/utils/openai');
 const app = require('../../server/src/index');
+const { clearCache } = require('../../server/src/index');
 
 const API_KEY = process.env.CHATTERPING_API_KEY;
+
+beforeEach(() => {
+  clearCache();
+});
 
 const mockMentions = [
   {

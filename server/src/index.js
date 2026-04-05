@@ -62,6 +62,24 @@ const apiLimiter = rateLimit({
   message: { error: 'Too many requests, please try again later' },
 });
 
+// In-memory response cache with TTL
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const cache = new Map();
+
+function getCached(key) {
+  const entry = cache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+    cache.delete(key);
+    return null;
+  }
+  return entry.data;
+}
+
+function setCache(key, data) {
+  cache.set(key, { data, timestamp: Date.now() });
+}
+
 // Root route
 app.get('/', (req, res) => {
   res.json({ 
@@ -85,9 +103,14 @@ app.get('/debug/reddit', apiLimiter, requireApiKey, async (req, res) => {
     if (!keyword) {
       return res.status(400).json({ error: 'Keyword parameter is required' });
     }
+
+    const cacheKey = `reddit:${keyword.toLowerCase()}`;
+    const cached = getCached(cacheKey);
+    if (cached) return res.json(cached);
+
     const { mentions } = await fetchMentions(keyword);
     
-    res.json({
+    const response = {
       keyword: keyword,
       count: mentions.length,
       posts: mentions.map(post => ({
@@ -101,7 +124,10 @@ app.get('/debug/reddit', apiLimiter, requireApiKey, async (req, res) => {
         excerpt: post.excerpt.substring(0, 100) + '...',
         createdAt: post.createdAt
       }))
-    });
+    };
+
+    setCache(cacheKey, response);
+    res.json(response);
   } catch (error) {
     res.status(500).json({ 
       error: 'Failed to fetch Reddit data',
@@ -118,20 +144,27 @@ app.get('/summarize', apiLimiter, requireApiKey, async (req, res) => {
     if (!keyword) {
       return res.status(400).json({ error: 'Keyword parameter is required' });
     }
+
+    const cacheKey = `summarize:${keyword.toLowerCase()}`;
+    const cached = getCached(cacheKey);
+    if (cached) return res.json(cached);
+
     const { mentions } = await fetchMentions(keyword);
     
     if (mentions.length === 0) {
-      return res.json({ 
+      const response = { 
         summary: `No recent mentions found for ${keyword}.`,
         mentionCount: 0,
         keyword: keyword
-      });
+      };
+      setCache(cacheKey, response);
+      return res.json(response);
     }
 
     // Generate AI summary
     const summary = await generateSummary(mentions, keyword);
     
-    res.json({
+    const response = {
       summary: summary,
       mentionCount: mentions.length,
       keyword: keyword,
@@ -142,7 +175,10 @@ app.get('/summarize', apiLimiter, requireApiKey, async (req, res) => {
         score: post.score,
         url: post.url
       }))
-    });
+    };
+
+    setCache(cacheKey, response);
+    res.json(response);
     
   } catch (error) {
     console.error('Error in /summarize:', error);
@@ -160,3 +196,4 @@ if (require.main === module) {
 }
 
 module.exports = app;
+module.exports.clearCache = () => cache.clear();
