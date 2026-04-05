@@ -5,7 +5,7 @@ const CONFIG = {
     PROD_API_URL: 'https://chatterping-api.onrender.com',
 
     // API key — must match CHATTERPING_API_KEY on the server
-    API_KEY: '9bb3b3efb8cafd512225a06846724524583a11464e6d58a4'
+    API_KEY: 'cb629b1027de83ea18322180343ed6de7f55b8335801b9b1'
 };
 
 // Auto-detect environment: chrome-extension:// runs prod, everything else runs dev
