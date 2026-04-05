@@ -126,3 +126,21 @@ describe('CORS behavior', () => {
     expect(response.text).toContain('Not allowed by CORS');
   });
 });
+
+describe('Rate limiting', () => {
+  test('should return 429 after exceeding request limit', async () => {
+    fetchMentions.mockResolvedValue({ mentions: [], mock: true, reason: 'test' });
+
+    // Send 21 requests — the 21st should be rate limited
+    const results = [];
+    for (let i = 0; i < 21; i++) {
+      const res = await request(app)
+        .get('/summarize')
+        .set('x-api-key', API_KEY)
+        .query({ keyword: 'RateLimitTest' });
+      results.push(res.status);
+    }
+
+    expect(results[20]).toBe(429);
+  });
+});
